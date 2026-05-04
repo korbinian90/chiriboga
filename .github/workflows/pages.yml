@@ -92,13 +92,23 @@ jobs:
             sed -i "s#<script src=\"cardrenderer/pixi.min.js[^\"]*\"></script>#&${PATCH}#" "$f"
           done
 
+      # Register a Service Worker that caches card art from the NetrunnerDB
+      # CDN (see sw.js). First view of each card hits the network; later
+      # views are served from the browser Cache API.
+      - name: Register Service Worker on entry pages
+        run: |
+          REG='<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}</script>'
+          for f in _site/index.html _site/engine.html _site/decklauncher.html _site/gauntlet.html; do
+            sed -i "s#</head>#${REG}</head>#" "$f"
+          done
+
       # GitHub Pages cannot set custom HTTP headers, so the .htaccess CSP /
       # Referrer-Policy are re-established via <meta> equivalents. Headers that
       # cannot be set via meta (X-Frame-Options, X-Content-Type-Options,
       # Permissions-Policy, HSTS) cannot be replicated on Pages.
       - name: Inject security <meta> tags
         run: |
-          META='  <meta http-equiv="Content-Security-Policy" content="default-src '"'"'self'"'"'; img-src '"'"'self'"'"' data:; script-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"' https://www.googletagmanager.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"'; font-src '"'"'self'"'"' data:; connect-src '"'"'self'"'"' https://api.ipify.org https://www.google-analytics.com https://analytics.google.com; object-src '"'"'none'"'"'">\n  <meta name="referrer" content="strict-origin-when-cross-origin">'
+          META='  <meta http-equiv="Content-Security-Policy" content="default-src '"'"'self'"'"'; img-src '"'"'self'"'"' data: https://card-images.netrunnerdb.com; script-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' '"'"'unsafe-eval'"'"' https://www.googletagmanager.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"'; font-src '"'"'self'"'"' data:; connect-src '"'"'self'"'"' https://api.ipify.org https://card-images.netrunnerdb.com https://www.google-analytics.com https://analytics.google.com; object-src '"'"'none'"'"'">\n  <meta name="referrer" content="strict-origin-when-cross-origin">'
           for f in _site/index.html _site/engine.html _site/decklauncher.html _site/gauntlet.html; do
             # Case-insensitive match (charset value is "UTF-8" in index.php, "utf-8" in the others)
             sed -i "s|<meta charset=\"utf-8\">|&\n${META}|I" "$f"
