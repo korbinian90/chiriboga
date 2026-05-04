@@ -17,7 +17,7 @@ A static, mobile-friendly fork of [drbo6/chiriboga](https://github.com/drbo6/chi
 
 ## What's different in this fork
 
-The upstream PHP entry pages are rendered to HTML in a GitHub Actions workflow and deployed to Pages on every push to `main`. No PHP runtime is required for visitors — everything runs in the browser.
+The upstream PHP entry pages are rendered to HTML in a GitHub Actions workflow and deployed to Pages on every push to `dev`. No PHP runtime is required for visitors — everything runs in the browser.
 
 ## Local development
 
@@ -29,7 +29,7 @@ php -S localhost:8000
 
 Card images are not in the repo for licensing reasons. Download from [chiriboga.cronbach.com/images/images.zip](https://chiriboga.cronbach.com/images/images.zip) and extract into `images/`.
 
-For the debug menu, AI preference overrides, board-state setup helpers, and reproduction code, see [`documentation/debugging.md`](documentation/debugging.md).
+For the debug menu, AI preference overrides, board-state setup helpers, and reproduction code, see the developer documentation in the upstream repo: [drbo6/chiriboga](https://github.com/drbo6/chiriboga#developer-documentation).
 
 ## Credits
 
