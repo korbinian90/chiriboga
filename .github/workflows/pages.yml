@@ -78,6 +78,20 @@ jobs:
           </script>
           EOF
 
+      # When card images are not bundled (the default for this Pages deploy),
+      # PIXI.Texture.fromImage 404s for every card art / counter PNG and the
+      # engine's per-frame loading-texture ticker (cardrenderer.js) hangs at
+      # "DECKBUILDING…" forever waiting for texture.valid===true. Patch
+      # PIXI.Texture.fromImage right after pixi loads so errored textures are
+      # marked valid, letting the engine proceed with empty placeholders.
+      - name: Patch PIXI to tolerate missing card images
+        run: |
+          PATCH='<script>(function(){if(typeof PIXI==="undefined"||!PIXI.Texture||!PIXI.Texture.fromImage)return;var o=PIXI.Texture.fromImage;PIXI.Texture.fromImage=function(){var t=o.apply(this,arguments);if(t\&\&t.baseTexture)t.baseTexture.on("error",function(){t.valid=true;});return t;};})();</script>'
+          for f in _site/engine.html _site/decklauncher.html _site/gauntlet.html; do
+            # Use # as sed delimiter because PATCH contains || (JS logical-or)
+            sed -i "s#<script src=\"cardrenderer/pixi.min.js[^\"]*\"></script>#&${PATCH}#" "$f"
+          done
+
       # GitHub Pages cannot set custom HTTP headers, so the .htaccess CSP /
       # Referrer-Policy are re-established via <meta> equivalents. Headers that
       # cannot be set via meta (X-Frame-Options, X-Content-Type-Options,
