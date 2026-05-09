@@ -1,4 +1,10 @@
-images/
+# Card art (5-digit JPGs) is fetched from card-images.netrunnerdb.com via
+# the service worker at runtime and not committed (size + licensing). UI
+# sprites in images/ are tracked.
+images/[0-9][0-9][0-9][0-9][0-9].jpg
+images/[0-9][0-9][0-9][0-9][0-9].png
+images/hires/
+images/preview/
 chiriboga.code-workspace
 carddata/Netrunner Comprehensive Rules (v25.08).pdf
 Netrunner Comprehensive Rules (v25.08).pdf
