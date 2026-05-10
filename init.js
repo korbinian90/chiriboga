@@ -1678,6 +1678,30 @@ function UpdateModernHUD() {
   var youLabel = (you === corp) ? 'CORP' : 'RUNNER';
   var oppLabel = (opp === corp) ? 'CORP' : 'RUNNER';
 
+  // Turn-change banner: when activePlayer flips, briefly show whose
+  // turn it is. Track via a stored flag on the hud root; only fires on
+  // transition, so steady-state Render() is a no-op.
+  if (typeof activePlayer !== 'undefined' && activePlayer) {
+    var lastActive = hud.dataset.lastActive || '';
+    var nowActive = (activePlayer === corp) ? 'corp' : (activePlayer === runner ? 'runner' : '');
+    if (nowActive && nowActive !== lastActive) {
+      hud.dataset.lastActive = nowActive;
+      // Skip the very first transition (engine init: '' → 'corp').
+      if (lastActive !== '') {
+        var banner = document.getElementById('hud-turn-banner');
+        var text = document.getElementById('hud-turn-banner-text');
+        if (banner && text) {
+          var isYours = (activePlayer === you);
+          text.textContent = isYours ? 'YOUR TURN' : (nowActive === 'corp' ? "CORP'S TURN" : "RUNNER'S TURN");
+          banner.classList.remove('is-showing');
+          // force reflow so the next add restarts the animation
+          void banner.offsetWidth;
+          banner.classList.add('is-showing');
+        }
+      }
+    }
+  }
+
   function setText(id, val) {
     var el = document.getElementById(id);
     if (el && el.textContent !== String(val)) el.textContent = String(val);
