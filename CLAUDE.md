@@ -100,6 +100,21 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ### D. Phone-first layout (Phase C — design needed, talk to maintainer first)
 
+- [ ] **Tiny-card regression as servers grow.** Repro: tutorial 8 (player =
+  corp), play a few ICE / assets to new remote servers. As `corp.remoteServers`
+  grows, `init.js:1050-1064` recomputes `totalFieldWidth` and bumps `fieldZoom`,
+  which scales the *entire* PIXI scene down to fit. In portrait this makes
+  every card a thumbnail. Better solutions to evaluate:
+  - **Horizontal scroll / pan on the corp servers row** instead of fitting
+    everything to viewport (least disruptive — keep card size, let the user
+    swipe through servers).
+  - **Stack ICE on a single server vertically** with a small "tap to expand"
+    affordance, instead of wide ice rows.
+  - **Server pagination / carousel** so only N servers are visible at a
+    time with prev/next handles.
+  - The portrait-first PIXI scene item below would also resolve this if
+    each player area is a separate scrollable strip.
+
 - [ ] **Hybrid input.** Drag-to-zone for "play onto big zone" (install
   programs, advance ICE). Tap-then-tap for fiddly targeting (host arrows,
   individual ICE in remote servers, trace pumps). Today everything is
