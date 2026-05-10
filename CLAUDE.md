@@ -53,11 +53,6 @@ so PIXI textures stay CORS-clean.
 
 ### A. Engine load reliability (small, ship one at a time)
 
-- [ ] **SW pre-warm** for tutorial card art. On `install`, fetch the ~60
-  cards used by tutorials 7+8 (deck params decoded from `index.php:443-444`
-  with LZString) and put them in `chiriboga-cards-v1` so a cold visit to a
-  tutorial doesn't have to wait on cross-origin fetches. Don't block install
-  on it; use `event.waitUntil(Promise.allSettled(...))`.
 - [ ] **Bundle deferred big SVGs.** `NSG_HB.svg` (3.9 MB, base64-embedded
   raster) and `NSG_JINTEKI.svg` (343 KB) were dropped from the UI-sprite
   commit because of push-size limits. Both are decklauncher-only (in-card-
@@ -213,6 +208,15 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — SW pre-warm for tutorial card art (`sw.js`). Decoded the
+  two System Gateway starter decks from index.php:443-444 with LZString
+  → 34 unique 5-digit codes. Hardcoded into `TUTORIAL_PREWARM_CODES`
+  and fetched at SW `install` via `event.waitUntil(Promise.allSettled(...))`.
+  Cached under the proxy URL key (`<scope>/images/<code>.jpg`) so the
+  existing fetch-handler cache lookup hits. Idempotent — skips codes
+  already cached, so re-installs are cheap. If the tutorial decks ever
+  change in `index.php`, regenerate the list (decode params with
+  `deck/lz-string.min.js`).
 - 2026-05-10 — Modal-dismiss safety timeout in
   `cardrenderer/cardrenderer.js` (added at the top of the ticker setup,
   just before the existing texture-load splice loop). Independent
