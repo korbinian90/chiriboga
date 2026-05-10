@@ -1681,7 +1681,7 @@ function UpdateModernHUD() {
   // Turn-change banner: when activePlayer flips, briefly show whose
   // turn it is. Track via a stored flag on the hud root; only fires on
   // transition, so steady-state Render() is a no-op.
-  if (typeof activePlayer !== 'undefined' && activePlayer) {
+  if (activePlayer) {
     var lastActive = hud.dataset.lastActive || '';
     var nowActive = (activePlayer === corp) ? 'corp' : (activePlayer === runner ? 'runner' : '');
     if (nowActive && nowActive !== lastActive) {
@@ -1709,6 +1709,14 @@ function UpdateModernHUD() {
 
   setText('hud-you-label', youLabel);
   setText('hud-opp-label', oppLabel);
+
+  // Active-player breathing highlight: pulses the chip on whichever
+  // side currently holds the turn so it's clear at a glance even
+  // after the turn-change banner has faded.
+  var youChip = document.getElementById('hud-chip-you');
+  var oppChip = document.getElementById('hud-chip-opp');
+  if (youChip) youChip.classList.toggle('is-active', activePlayer === you);
+  if (oppChip) oppChip.classList.toggle('is-active', activePlayer === opp);
 
   // Side stat chips: clicks + credits. Hide click counters when not
   // that player's action phase (engine sets clickTracker to 0 between

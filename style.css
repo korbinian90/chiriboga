@@ -957,6 +957,15 @@ canvas {
 	top: calc(80px + env(safe-area-inset-top, 0)); /* below the menubar */
 	left: calc(8px + env(safe-area-inset-left, 0));
 }
+.hud-chip.is-active {
+	border-color: var(--crt-green);
+	box-shadow: 0 0 14px rgba(64,255,128,0.55), inset 0 0 14px rgba(64,255,128,0.18);
+	animation: hudChipBreath 2.4s ease-in-out infinite;
+}
+@keyframes hudChipBreath {
+	0%, 100% { box-shadow: 0 0 14px rgba(64,255,128,0.45), inset 0 0 14px rgba(64,255,128,0.14); }
+	50%      { box-shadow: 0 0 20px rgba(64,255,128,0.7),  inset 0 0 18px rgba(64,255,128,0.28); }
+}
 .hud-chip-you {
 	bottom: calc(72px + env(safe-area-inset-bottom, 0)); /* above the footer */
 	right: calc(8px + env(safe-area-inset-right, 0));
@@ -1102,6 +1111,22 @@ body:has(#loading:not([style*="display: none"])) #modern-hud { display: none; }
 		82%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); letter-spacing: 6px; }
 		100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); letter-spacing: 10px; }
 	}
+}
+
+/* Respect motion-sensitivity: drop the breathing/pulsing/sweep animations
+   on new HUD overlays for users who prefer reduced motion. The visual
+   states themselves remain (active chip stays brighter; turn banner
+   still appears, just without the scale/letter-spacing sweep). */
+@media (prefers-reduced-motion: reduce) {
+	.hud-chip.is-active        { animation: none; } /* keep the brighter border, drop the breath */
+	.hud-continue.is-pulsing   { animation: none; } /* keep the glow, drop the pulse */
+	.hud-turn-banner.is-showing { animation: turnBannerFade 1.4s linear forwards; } /* simple fade */
+}
+@keyframes turnBannerFade {
+	0%   { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+	18%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+	82%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+	100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
 .fullscreen-button {
