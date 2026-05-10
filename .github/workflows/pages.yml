@@ -42,6 +42,30 @@ jobs:
             php -f "${f}.php" > "_site/${f}.html"
           done
 
+      # Write a curl-able version manifest so we can correlate a deployed
+      # build to a commit / workflow run, and inject a <meta name="build-
+      # version"> into every entry HTML so View-Source / DevTools can show
+      # it on any page (the landing page already prints the short SHA in
+      # its visible BUILD line via $buildSha in index.php).
+      - name: Write build version metadata
+        run: |
+          SHA_SHORT="${GITHUB_SHA:0:7}"
+          BUILD_DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '%s\n' \
+            '{' \
+            "  \"sha\": \"${GITHUB_SHA}\"," \
+            "  \"shaShort\": \"${SHA_SHORT}\"," \
+            "  \"ref\": \"${GITHUB_REF_NAME}\"," \
+            "  \"buildDate\": \"${BUILD_DATE_UTC}\"," \
+            "  \"runId\": \"${GITHUB_RUN_ID}\"," \
+            "  \"runUrl\": \"https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"" \
+            '}' > _site/version.json
+          META="<meta name=\"build-version\" content=\"${SHA_SHORT} ${BUILD_DATE_UTC}\">"
+          for f in _site/index.html _site/engine.html _site/decklauncher.html _site/gauntlet.html; do
+            # Case-insensitive (charset is "UTF-8" in index.php and "utf-8" in the others)
+            sed -i "s|<meta charset=\"utf-8\">|&\n  ${META}|I" "$f"
+          done
+
       - name: Rewrite cross-page navigation from .php to .html
         run: |
           find _site -type f \( -name '*.js' -o -name '*.html' \) -print0 \
