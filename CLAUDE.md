@@ -87,6 +87,27 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 - [ ] **Hold-to-confirm on Concede / dangerous prompts.** `engine.php`
   has `EXIT TO MAIN MENU` near thumb-rest territory. Two-step modal or
   500 ms hold to confirm.
+- [ ] **"Explain" game mode.** A toggle (per-game or in settings) that
+  makes the engine narrate every meaningful action as it happens, in
+  plain English: "Corp drew a card", "Runner installed Smartware
+  Distributor (1 credit)", "Run on R&D — encountered Eli 1.0 (rezzed
+  for 3)", "Subroutine fired: end the run". Goal is to help new
+  players learn what's happening without reading the full rulebook,
+  similar to how Hearthstone's tutorial narrates the first few
+  matches. Implementation sketch:
+  - Likely lives next to the existing `Log()` / `narration` flow in
+    `utility.js:650` (already gates on a `#narration` checkbox for
+    accessibility text). Re-use the same hook surface.
+  - For each engine action (draw, click-credit, install, rez,
+    encounter-ice, subroutine-fire, score, steal, take-damage,
+    end-of-turn) emit a short human sentence via a new `Explain()`
+    function; same call sites already write to the history strip.
+  - Surface in a non-modal corner panel so the player can keep
+    playing while reading (Hearthstone-style "Coach" balloon). Use
+    the existing `#history-tooltip` styling as the visual base.
+  - Settings toggle defaults ON in tutorial mode, OFF in Quick Game
+    so experienced players don't get noise. Override per-session via
+    a small "Explain ☑" chip near the menubar.
 
 ### D. Phone-first layout (Phase C — design needed, talk to maintainer first)
 
