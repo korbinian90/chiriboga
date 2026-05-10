@@ -601,6 +601,8 @@
 				<span class="hud-stat" id="hud-you-credits" title="Credits"><span class="hud-stat-icon" aria-hidden="true">¢</span><span class="hud-stat-val">·</span></span>
 			</div>
 			<button type="button" id="hud-continue" class="hud-continue" aria-label="Continue">CONTINUE</button>
+			<!-- Turn-change banner — fades in for ~1.4s when activePlayer flips. -->
+			<div id="hud-turn-banner" class="hud-turn-banner" aria-hidden="true"><span id="hud-turn-banner-text"></span></div>
 		</div>
 		<div id="footer"></div>
 		<div id="modal" class="modal">

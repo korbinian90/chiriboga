@@ -1067,6 +1067,43 @@ body.accessibility-text #modern-hud { display: none; }
    and the chip values aren't meaningful before Setup completes. */
 body:has(#loading:not([style*="display: none"])) #modern-hud { display: none; }
 
+/* Turn-change banner — big centered text that fades in for ~1.4s when
+   activePlayer flips. Pure presentational; gameplay continues underneath
+   (pointer-events: none). */
+.hud-turn-banner {
+	position: fixed;
+	top: 38%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0.85);
+	font-family: 'PlayBoldNisei', 'Courier New', monospace;
+	font-size: 38px;
+	font-weight: 800;
+	letter-spacing: 8px;
+	color: var(--crt-green-pale, var(--crt-green));
+	text-shadow: 0 0 24px rgba(64,255,128,0.9), 0 0 48px rgba(64,255,128,0.4);
+	white-space: nowrap;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 7;
+	will-change: opacity, transform;
+}
+.hud-turn-banner.is-showing { animation: turnBannerSweep 1.4s ease-out forwards; }
+@keyframes turnBannerSweep {
+	0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); letter-spacing: 4px; }
+	18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); letter-spacing: 8px; }
+	82%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); letter-spacing: 8px; }
+	100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); letter-spacing: 14px; }
+}
+@media (max-width: 480px) {
+	.hud-turn-banner { font-size: 28px; letter-spacing: 6px; }
+	@keyframes turnBannerSweep {
+		0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); letter-spacing: 3px; }
+		18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); letter-spacing: 6px; }
+		82%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); letter-spacing: 6px; }
+		100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); letter-spacing: 10px; }
+	}
+}
+
 .fullscreen-button {
 	position:fixed;
 	top:env(safe-area-inset-top,0);
