@@ -113,9 +113,12 @@
 		font-size: 13px !important;
 		padding: 6px 10px !important;
 		overflow: hidden !important;
-		text-overflow: ellipsis !important;
 		white-space: normal !important;
 		line-height: 1.15 !important;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 2 !important;
+		-webkit-box-orient: vertical !important;
+		text-overflow: ellipsis !important;
 	}
 	#header h2, #header h3 { font-size: 13px !important; margin: 0 !important; }
 	.fullscreen-button {
