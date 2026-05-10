@@ -2000,9 +2000,17 @@ var CardRenderer = {
       interfacerUpdate();
 
       //set up a callback to resize renderer if window is resized
+      //(phone rotate, browser-chrome show/hide, desktop window drag)
       window.onresize = function (event) {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.app.renderer.resize(w, h);
+        this.app.stage.pivot.x = w / 2;
+        this.app.stage.pivot.y = h / 2;
+        this.app.stage.x = w / 2;
+        this.app.stage.y = h / 2;
         onresize.callback();
-      };
+      }.bind(this);
       window.onresize.callback = resizeCallback;
 
       this.counters = [];

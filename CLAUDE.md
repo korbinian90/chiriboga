@@ -59,12 +59,6 @@ so PIXI textures stay CORS-clean.
 
 Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
-- [ ] **PIXI canvas resize listener.** `cardrenderer/cardrenderer.js:1525-1527`
-  sizes the canvas once from `innerWidth/innerHeight` and never again.
-  Phone-rotate / browser-chrome show-hide leaves the scene mis-sized. Add
-  `window.addEventListener('resize', ...)` → `app.renderer.resize(w, h)` +
-  re-layout via the existing `ResizeCallback` (the cardRenderer constructor
-  already accepts one — `init.js:229`).
 - [ ] **HiDPI canvas.** PIXI Application is created without `resolution` or
   `autoDensity`. On a 3× retina phone, text is upscaled and soft. Pass
   `{ resolution: window.devicePixelRatio, autoDensity: true, transparent: true }`.
@@ -202,6 +196,15 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — PIXI canvas resize listener
+  (`cardrenderer/cardrenderer.js`). The existing `window.onresize`
+  hook only re-ran the layout callback; it never resized the renderer
+  itself, so phone-rotate / browser-chrome show-hide left the scene
+  letterboxed. Now also calls `app.renderer.resize(w, h)` and
+  re-centres the stage pivot/position before invoking the layout
+  callback. No debounce — `renderer.resize()` is cheap and the
+  callback is the existing `Render()` path; if perf shows up as an
+  issue on slow phones, wrap with `requestAnimationFrame`.
 - 2026-05-10 — Bundle the deferred HB/Jinteki faction icons as PNGs.
   Originals were 3.9 MB / 343 KB SVGs that wrapped embedded raster.
   Re-rendered at 256×256 PNG with cairosvg → 41 KB / 44 KB. Updated the
