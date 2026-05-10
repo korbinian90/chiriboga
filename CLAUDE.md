@@ -105,6 +105,34 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
   - The portrait-first PIXI scene item below would also resolve this if
     each player area is a separate scrollable strip.
 
+- [ ] **End-Turn rope / center-of-thumb continue button.** From the 2026-05-10
+  screenshot tour (`/tmp/play/03-engine-portrait-tut7.png`): the "Continue"
+  button is a small green-outline rectangle wedged at the very bottom-left,
+  far from the natural thumb resting position. Modern card games (Hearthstone
+  rope, Snap's central Reveal) use a glowing, ≥56 px, center-bottom action
+  button as the default tap target. Wire `currentPhase`'s primary command
+  (usually `n`) into a fixed center-bottom canvas overlay button.
+
+- [ ] **Big agenda-points scoreboard top-center.** Right now agenda points
+  aren't visible in the chrome — only the click counters render as floating
+  numbers mid-canvas. A "1 / 7 · 0 / 7" runner/corp score chip top-centre
+  (between menubar and tutorial badge) would make win progress legible at
+  every glance. Snap, Hearthstone, LoR all feature score prominently.
+
+- [ ] **Counter chips for click counters.** The two click counters
+  (`runner.clicks`, `corp.clicks`) render as ~12 px green text drifting in
+  the canvas (visible top and middle in the same screenshot). Wrap each in a
+  small chip with an icon glyph (e.g. ⌚) sized ≥32 px, anchored to the
+  player's side of the screen. This is the same pattern as the proposed
+  "Counter chips for stacks" item.
+
+- [ ] **Decklauncher PLAY button cut off in landscape on short phones.** From
+  `/tmp/play/13-decklauncher-landscape.png`: 844×390 viewport, the PLAY DECK /
+  SET AS OPPONENT row is partially below the fold. The deckbuilder's
+  `min-height: 100vh` was bumped to `100dvh` in PR #17 but the inner content
+  may need scrollable overflow + a sticky bottom action bar in this height
+  range. Possibly a 1-line CSS fix; verify on a real iPhone in landscape.
+
 - [ ] **Hybrid input.** Drag-to-zone for "play onto big zone" (install
   programs, advance ICE). Tap-then-tap for fiddly targeting (host arrows,
   individual ICE in remote servers, trace pumps). Today everything is
