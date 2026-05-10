@@ -410,8 +410,6 @@ input[type=submit] {
 }
 
 body {
-	background:var(--bg-dark);
-body {
 	background: #101810;
 	position: relative;
 	min-height: 100vh;
