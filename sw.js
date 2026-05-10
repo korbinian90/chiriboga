@@ -8,8 +8,32 @@ const CACHE_VERSION = 'chiriboga-cards-v1';
 const CARD_HOST = 'https://card-images.netrunnerdb.com/v2/large/';
 const CARD_PATH_RE = /\/images\/(\d{5})\.jpg$/;
 
-self.addEventListener('install', () => {
+// Card codes used by tutorials 7 + 8 (the two starter-deck tutorials in
+// index.php). Both tutorials share the same two System Gateway decks; the
+// player just swaps sides. Decoded once from the LZString deck params at
+// index.php:443-444. Update if those tutorials change.
+const TUTORIAL_PREWARM_CODES = [
+  '30006', '30012', '30013', '30014', '30015', '30018', '30020', '30021',
+  '30026', '30027', '30028', '30029', '30030', '30032', '30033', '30034',
+  '30037', '30039', '30040', '30042', '30045', '30046', '30047', '30064',
+  '30067', '30069', '30070', '30071', '30072', '30073', '30074', '30075',
+  '30076', '30077',
+];
+
+self.addEventListener('install', (event) => {
   self.skipWaiting();
+  // Pre-warm tutorial card art so a cold visit to tutorial 7/8 doesn't have
+  // to wait on ~34 cross-origin fetches in series. Promise.allSettled so a
+  // single CDN miss doesn't fail install.
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_VERSION);
+    await Promise.allSettled(TUTORIAL_PREWARM_CODES.map(async (code) => {
+      const proxyKey = new Request(new URL('images/' + code + '.jpg', self.registration.scope).href);
+      if (await cache.match(proxyKey)) return;
+      const res = await fetch(CARD_HOST + code + '.jpg', { mode: 'cors', credentials: 'omit' });
+      if (res.ok) await cache.put(proxyKey, res);
+    }));
+  })());
 });
 
 self.addEventListener('activate', (event) => {
