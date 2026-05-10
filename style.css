@@ -924,6 +924,149 @@ canvas {
 																	supported by Chrome and Opera */
 }
 
+/* ===== Modern HUD overlay (engine page only) ===== */
+/* Opponent chip top-left + score chip top-center + your chip bottom-right
+   + big Continue CTA bottom-center. Driven by UpdateModernHUD() in
+   init.js, which reads the canonical engine state every Render(). */
+#modern-hud {
+	pointer-events: none; /* children opt back in */
+	position: fixed;
+	inset: 0;
+	z-index: 6;
+	font-family: 'PlayBoldNisei', 'Courier New', monospace;
+}
+.hud-chip {
+	pointer-events: auto;
+	position: fixed;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 6px 12px;
+	border: 1px solid var(--border-green-dark);
+	border-radius: 8px;
+	background: rgba(12, 24, 12, 0.85);
+	color: var(--crt-green);
+	font-size: 13px;
+	letter-spacing: 1px;
+	box-shadow: 0 0 10px var(--green-shadow-medium-rgba), inset 0 0 12px rgba(0,0,0,0.6);
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+}
+.hud-chip-opp {
+	top: calc(80px + env(safe-area-inset-top, 0)); /* below the menubar */
+	left: calc(8px + env(safe-area-inset-left, 0));
+}
+.hud-chip-you {
+	bottom: calc(72px + env(safe-area-inset-bottom, 0)); /* above the footer */
+	right: calc(8px + env(safe-area-inset-right, 0));
+}
+.hud-side-label {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 2px;
+	opacity: 0.65;
+	padding-right: 4px;
+	border-right: 1px solid var(--border-green-dark);
+	margin-right: 2px;
+}
+.hud-stat {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 3px;
+	font-weight: 700;
+}
+.hud-stat-icon {
+	font-size: 12px;
+	opacity: 0.7;
+}
+.hud-stat-val {
+	font-variant-numeric: tabular-nums;
+	min-width: 14px;
+	text-align: right;
+}
+
+/* Score chip top-center: glowing & prominent. */
+.hud-score {
+	pointer-events: auto;
+	position: fixed;
+	top: calc(8px + env(safe-area-inset-top, 0));
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: baseline;
+	gap: 3px;
+	min-height: 40px;
+	padding: 4px 14px;
+	border: 1px solid var(--crt-green);
+	border-radius: 999px;
+	background: rgba(12, 24, 12, 0.92);
+	color: var(--crt-green);
+	font-size: 18px;
+	font-weight: 800;
+	letter-spacing: 1px;
+	box-shadow: 0 0 14px var(--green-shadow-medium-rgba);
+	font-variant-numeric: tabular-nums;
+}
+.hud-score-you { color: var(--crt-green-pale, var(--crt-green)); text-shadow: 0 0 6px var(--green-shadow-medium-rgba); }
+.hud-score-sep { opacity: 0.55; padding: 0 2px; }
+.hud-score-target { opacity: 0.7; font-size: 14px; }
+
+/* Big Continue CTA. Hearthstone-rope / Snap-Reveal pattern: glowing
+   center-bottom thumb-target with a one-letter shortcut (n) that maps
+   to the existing #footerbutton-n. Hidden until the engine has a
+   single primary command pending, otherwise we'd cover up multi-option
+   prompts in #footer. */
+.hud-continue {
+	pointer-events: auto;
+	position: fixed;
+	bottom: calc(12px + env(safe-area-inset-bottom, 0));
+	left: 50%;
+	transform: translateX(-50%);
+	min-width: 180px;
+	min-height: 56px;
+	padding: 0 28px;
+	border: 1px solid var(--crt-green);
+	border-radius: 28px;
+	background: linear-gradient(180deg, rgba(20,60,20,0.92) 0%, rgba(8,28,8,0.92) 100%);
+	color: var(--crt-green-pale, var(--crt-green));
+	font-family: 'PlayBoldNisei', 'Courier New', monospace;
+	font-size: 16px;
+	font-weight: 800;
+	letter-spacing: 4px;
+	cursor: pointer;
+	box-shadow: 0 0 18px var(--green-shadow-medium-rgba), inset 0 0 18px rgba(0,255,128,0.18);
+	display: none; /* JS turns this on */
+	transition: transform 0.08s ease, box-shadow 0.2s ease;
+}
+.hud-continue:hover, .hud-continue:focus-visible {
+	box-shadow: 0 0 22px rgba(64,255,128,0.55), inset 0 0 22px rgba(64,255,128,0.28);
+	outline: none;
+}
+.hud-continue:active { transform: translateX(-50%) translateY(1px); }
+.hud-continue.is-pulsing {
+	animation: hudPulse 1.6s ease-in-out infinite;
+}
+@keyframes hudPulse {
+	0%, 100% { box-shadow: 0 0 18px var(--green-shadow-medium-rgba), inset 0 0 18px rgba(0,255,128,0.18); }
+	50%      { box-shadow: 0 0 28px rgba(64,255,128,0.6),       inset 0 0 24px rgba(64,255,128,0.32); }
+}
+
+/* Tighter chips on small phones so they don't crowd corners. */
+@media (max-width: 480px) {
+	.hud-chip { font-size: 12px; padding: 5px 9px; gap: 6px; }
+	.hud-side-label { display: none; } /* drop the "CORP"/"RUNNER" label to save width */
+	.hud-score { font-size: 16px; padding: 4px 12px; }
+	.hud-continue { min-width: 160px; min-height: 52px; font-size: 15px; letter-spacing: 3px; }
+}
+
+/* Hide the HUD when the engine is in text-accessibility mode. */
+body.accessibility-text #modern-hud { display: none; }
+
+/* Hide HUD while the loading modal is up — they'd overlap visually
+   and the chip values aren't meaningful before Setup completes. */
+body:has(#loading:not([style*="display: none"])) #modern-hud { display: none; }
+
 .fullscreen-button {
 	position:fixed;
 	top:env(safe-area-inset-top,0);

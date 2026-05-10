@@ -1631,10 +1631,104 @@ function Render() {
 
   //update actual rendered view (this would eventually be done automatically but this can cause issues with hover detection out of sync
   cardRenderer.app.render(cardRenderer.app.stage);
-  
+
   //update counter colors based on run state
   UpdateCounterColors();
+
+  //update the modern HUD overlay (score chip top-center, opp/you chips,
+  //and the big Continue CTA). It's an HTML overlay outside the canvas
+  //so it can be sized to thumb-friendly mobile dimensions independent
+  //of the PIXI fieldZoom-scaled scene.
+  if (typeof UpdateModernHUD === 'function') UpdateModernHUD();
 }
+
+/**
+ * Refresh the #modern-hud overlay from the canonical engine state.
+ * Cheap — pulls a handful of scalar values and writes textContent only.
+ * Safe to call every Render(). Reads viewingPlayer / runner / corp /
+ * currentPhase / phaseOptions / globalProperties.agendaPointsToWin.
+ */
+function UpdateModernHUD() {
+  var hud = document.getElementById('modern-hud');
+  if (!hud) return;
+  if (typeof runner === 'undefined' || typeof corp === 'undefined') return;
+
+  var you = (typeof viewingPlayer !== 'undefined' && viewingPlayer === corp) ? corp : runner;
+  var opp = (you === runner) ? corp : runner;
+  var youLabel = (you === corp) ? 'CORP' : 'RUNNER';
+  var oppLabel = (opp === corp) ? 'CORP' : 'RUNNER';
+
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el && el.textContent !== String(val)) el.textContent = String(val);
+  }
+
+  setText('hud-you-label', youLabel);
+  setText('hud-opp-label', oppLabel);
+
+  // Side stat chips: clicks + credits. Hide click counters when not
+  // that player's action phase (engine sets clickTracker to 0 between
+  // turns) — but we keep the slot visible for layout stability.
+  var youClicks = (typeof you.clickTracker === 'number') ? you.clickTracker : 0;
+  var oppClicks = (typeof opp.clickTracker === 'number') ? opp.clickTracker : 0;
+  // The chip already has icon spans; we want to update only the value
+  // child, not the wrapper (else we'd wipe the icon).
+  function setStat(rootId, value) {
+    var root = document.getElementById(rootId);
+    if (!root) return;
+    var v = root.querySelector('.hud-stat-val');
+    if (v && v.textContent !== String(value)) v.textContent = String(value);
+  }
+  setStat('hud-you-clicks', youClicks);
+  setStat('hud-opp-clicks', oppClicks);
+  setStat('hud-you-credits', (typeof Credits === 'function') ? Credits(you) : (you.creditPool || 0));
+  setStat('hud-opp-credits', (typeof Credits === 'function') ? Credits(opp) : (opp.creditPool || 0));
+
+  // Score chip top-center: "<your agenda> / <target>". Use Hearthstone
+  // pattern (the player's own progress). Opponent points are visible
+  // via opp chip if we want to add it later.
+  var targetPts = (typeof globalProperties !== 'undefined' && globalProperties.agendaPointsToWin) || 7;
+  var youPts = (typeof AgendaPoints === 'function') ? AgendaPoints(you) : 0;
+  setText('hud-score-you', youPts);
+  setText('hud-score-target', targetPts);
+
+  // Continue CTA: visible only when the engine surfaces exactly one
+  // button in #footer (Keep / Continue / End-turn / etc.). When there
+  // are multiple options (e.g. choose-which-ice-to-rez), let those
+  // buttons stay in #footer and hide the CTA so we don't duplicate.
+  var btn = document.getElementById('hud-continue');
+  if (btn) {
+    var footerBtns = Array.from(document.querySelectorAll('#footer button.button'));
+    var visible = footerBtns.filter(function (b) {
+      return getComputedStyle(b).display !== 'none' && b.offsetParent !== null;
+    });
+    var primary = visible.length === 1 ? visible[0] : null;
+    if (primary) {
+      btn.style.display = 'inline-block';
+      btn.classList.add('is-pulsing');
+      btn.dataset.primaryId = primary.id || '';
+      var label = (primary.textContent || '').trim().toUpperCase() || 'CONTINUE';
+      if (btn.textContent.trim() !== label) btn.textContent = label;
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+}
+
+// Wire the HUD continue button once at load — the click delegates to
+// the engine's #footerbutton-n which already executes the right command.
+document.addEventListener('DOMContentLoaded', function () {
+  var btn = document.getElementById('hud-continue');
+  if (!btn) return;
+  btn.addEventListener('click', function (e) {
+    // Click whatever single primary button the engine has in #footer.
+    var pid = btn.dataset.primaryId;
+    var primary = (pid && document.getElementById(pid))
+      || document.getElementById('footerbutton-n');
+    if (primary) primary.click();
+    e.preventDefault();
+  });
+});
 
 //Update counter colors dynamically based on run state
 function UpdateCounterColors() {
