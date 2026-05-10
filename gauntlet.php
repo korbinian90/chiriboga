@@ -105,7 +105,9 @@
 							var iconName = word.toUpperCase();
 							if (iconName === 'TRASH') iconName = 'TRASH_ABILITY';
 							iconName = iconName.replace(/-/g, '_');
-							return '<img src="images/nsg/NSG_' + iconName + '.svg" class="card-icon" alt="' + word + '">';
+							// HB / Jinteki are PNGs (originals were 3.9 MB / 343 KB embedded-raster SVGs).
+							var iconExt = (iconName === 'HB' || iconName === 'JINTEKI') ? 'png' : 'svg';
+							return '<img src="images/nsg/NSG_' + iconName + '.' + iconExt + '" class="card-icon" alt="' + word + '">';
 						});
 						cardText = cardText.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
 						infoHTML += '<div class="card-text">' + cardText + '</div>';
@@ -3649,7 +3651,9 @@
 					if (iconName === 'TRASH') iconName = 'TRASH_ABILITY';
 					// Replace all hyphens with underscores in icon name
 					iconName = iconName.replace(/-/g, '_');
-					return '<img src="images/nsg/NSG_' + iconName + '.svg" class="card-icon" alt="' + word + '">';
+					// HB / Jinteki are PNGs (originals were 3.9 MB / 343 KB embedded-raster SVGs).
+					var iconExt = (iconName === 'HB' || iconName === 'JINTEKI') ? 'png' : 'svg';
+					return '<img src="images/nsg/NSG_' + iconName + '.' + iconExt + '" class="card-icon" alt="' + word + '">';
 				});
 				// Replace newlines with <br> tags (handle both literal \n and actual newlines)
 				cardText = cardText.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
