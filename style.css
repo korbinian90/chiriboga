@@ -545,6 +545,7 @@ canvas {
 	top:0;
 	left:0;
 	z-index: 0; /*-1*/
+	touch-action: none; /* disable native gestures (pinch-zoom, double-tap zoom, rubber-band scroll) over play area */
 }
 
 #footer {
