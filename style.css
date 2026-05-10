@@ -2437,19 +2437,21 @@ select::-ms-expand { display: none; }
 		-webkit-transform: none !important;
 		transform: none !important;
 	}
-	#cardcontainer .count-badge { 
-		font-size:14px; 
-		min-width:28px; 
-		min-height:28px; 
-		padding:3px 5px; 
+	#cardcontainer .count-badge {
+		font-size:14px;
+		/* Keep 48px hit area from the 480px block — Apple HIG / Material */
+		min-width:48px;
+		min-height:48px;
+		padding:3px 5px;
 		/* Mobile paint fix: simplified transform for faster paint */
 		-webkit-transform: translate(-50%, -50%);
 		transform: translate(-50%, -50%);
 	}
-	#cardcontainer .card-controls button { 
-		font-size:12px; 
-		padding:3px 0; 
-		border-radius:3px; 
+	#cardcontainer .card-controls button {
+		font-size:12px;
+		padding:8px 0;
+		border-radius:3px;
+		/* Inherits min-height:48px from the 480px block */
 	}
 	#cardcontainer .card-controls { 
 		margin-top:2px; 
@@ -2738,7 +2740,9 @@ body { background: #0a0a0a; min-height: 100vh; display: flex; align-items: cente
 	.screen-content { align-items:stretch; }
 	.menu-buttons { flex: 1 1 33%; display: flex; flex-direction: column; gap: 6px; min-width: 320px;}
 	#credits-panel.credits-panel { flex: 1 1 33%; display:flex; flex-direction:column; gap:6px; min-width:320px; }
-	.menu-buttons .menu-item { width: 100%; font-size: 12px}
+	/* 48px hit-target floor on the index landing-page menu buttons too —
+	   was 36-40px tall with 12px font on phones. */
+	.menu-buttons .menu-item { width: 100%; min-height: 48px; font-size: 14px; padding: 14px 30px; box-sizing: border-box; display: flex; align-items: center; }
 	.match-preview { flex: 1 1 33%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 0; max-width: 120px; }
 	/* Tighten portrait stack so height constraint keeps all visible */
 	.match-preview .portrait-container { width: 70px; height: 70px; }

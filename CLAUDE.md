@@ -180,20 +180,6 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
-<<<<<<< HEAD
-- 2026-05-10 — Safe-area-inset on fixed UI chrome. `style.css`:
-  `#footer` (`bottom`/`left`), `#menubar` (`top`/`left`),
-  `#history-wrapper` (`top` via `calc(... + env(...))` since the
-  base is `65px`, `right`), and `.fullscreen-button` (`top`/`right`)
-  now anchor to `env(safe-area-inset-*, 0)`. `init.js:1089` writes
-  `#history-wrapper.top` at runtime, so it was migrated to a
-  `calc(...)` string too — otherwise it'd overwrite the CSS env
-  fallback. `engine.php` / `decklauncher.php` / `gauntlet.php` viewport
-  meta tags now include `viewport-fit=cover` so iOS draws content
-  under the notch / home-indicator (`index.php` already had it).
-  env() falls back to 0 on non-notch viewports, so existing layouts
-  are unchanged. Smoke test green.
-=======
 - 2026-05-10 — 48 px hit targets on small-phone breakpoints (`style.css`
   `@media (max-width: 480px)` and `@media (max-width: 360px)`, plus
   the `@media (max-height: 768px)` block for the index landing-page
@@ -205,7 +191,6 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
   481+ px is preserved. The previous values (24 - 40 px) were below
   both Apple HIG (44 pt) and Material (48 dp) — fat-finger mis-tap
   risk. Smoke test green.
->>>>>>> 34f713f (Bump small-phone hit targets to 48px)
 - 2026-05-10 — Disable native touch gestures on the play canvas.
   `style.css`: added `touch-action: none` to the `canvas` rule.
   `cardrenderer.js`: added a `touchstart` listener with `e.preventDefault()`
