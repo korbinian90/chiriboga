@@ -571,8 +571,8 @@ canvas {
 
 #header {
  position:fixed;
- top:0;
- right:0;
+ top:env(safe-area-inset-top,0);
+ right:env(safe-area-inset-right,0);
  height:65px;
  background:var(--bg-dark);
  width:480px;
