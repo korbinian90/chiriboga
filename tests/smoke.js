@@ -34,6 +34,10 @@ const ALLOWED_ERROR_PATTERNS = [
   /googletagmanager\.com/,    // GA blocked in sandbox
   /www\.google-analytics\.com/,
   /api\.ipify\.org/,           // injected by pages.yml; CI doesn't run that step
+  // Pre-existing missing UI sprites that don't break the engine — track
+  // separately if we want them back.
+  /\/images\/history_(corp|runner)_small\.png/,
+  /\/images\/NISEI_CREDIT\.png/,
 ];
 
 const MIME = {
@@ -97,17 +101,19 @@ function startServer(dir, port) {
     await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: 'networkidle', timeout: 20000 });
     await page.screenshot({ path: path.join(SCREENS, '01-index.png') });
 
-    // 2. Launch tutorial 1 (clicks-and-runs) — uses no card art so it's
-    //    independent of the CDN. This is a navigation, so wait for it.
-    await Promise.all([
-      page.waitForLoadState('domcontentloaded', { timeout: 15000 }),
-      page.evaluate(() => startTutorial(0)),
-    ]);
+    // 2. Launch tutorial 7 (vs Corp starter deck) directly via URL — it has
+    //    a full System Gateway deck so totalFieldWidth > viewport on a phone,
+    //    fieldZoom > 1, and the layout exercises the CSS-vs-PIXI-coord-space
+    //    decoupling. Tutorial 1 is too small to trigger fieldZoom > 1 and
+    //    therefore wouldn't catch a class of "canvas overflows viewport"
+    //    regressions.
+    const t7 = '/engine.html?ap=6&p=r&r=N4IglgJgpgdgLmOBPEAuAzABkwdgGwA0IAxgIYBOEAzmgNpbaEOZPYCMATAQ59++n0xsALILYBWMZJ4AOQR0zzFDDm3lqVrTBy0cc8-SrlH5x7BwCc8qwyyC7t5dnRdbr5wNufnwgLoBfIA&c=N4IglgJgpgdgLmOBPEAuAzABkwdhwGhAGMBDAJwgGc0BtLTdA%2Bx-ZgTle3Q-oBZNOmfoN4AmEQFZJIgGyyRTbL0WYZvQWo0qZ27T2wz9uAfRwnsOAIyCrN8afsXHudDden1Hm1NM%2BLEgF0AXyA&t=1';
+    await page.goto(`http://127.0.0.1:${PORT}${t7}`, { waitUntil: 'domcontentloaded', timeout: 20000 });
 
     // 3. Renderer constructed
     await page.waitForFunction(() => typeof cardRenderer !== 'undefined' && cardRenderer.app, null, { timeout: 15000 });
 
-    // 4. Loading modal dismissed
+    // 4. Loading modal dismissed (safety timeout fires at 8s if textures stall)
     const t0 = Date.now();
     await page.waitForFunction(() => {
       const el = document.getElementById('loading');
@@ -116,10 +122,10 @@ function startServer(dir, port) {
     const dismissMs = Date.now() - t0;
     console.log(`[smoke] loading modal dismissed after ${dismissMs} ms`);
 
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
     await page.screenshot({ path: path.join(SCREENS, '02-tutorial.png') });
 
-    // 5. HiDPI canvas sanity check
+    // 5. HiDPI canvas + viewport sanity check
     const info = await page.evaluate(() => {
       const r = cardRenderer.app.renderer;
       const c = document.querySelector('canvas');
@@ -129,15 +135,27 @@ function startServer(dir, port) {
         screenW: r.screen.width, screenH: r.screen.height,
         resolution: r.resolution, autoResize: r.autoResize,
         dpr: window.devicePixelRatio,
+        innerW: window.innerWidth, innerH: window.innerHeight,
       };
     });
     console.log('[smoke] renderer state:', JSON.stringify(info));
 
     if (!(info.resolution >= 1)) throw new Error(`unexpected renderer.resolution: ${info.resolution}`);
     if (!info.autoResize)        throw new Error(`autoResize should be true`);
-    const expectedCanvasW = Math.round(info.cssW * info.resolution);
+    // Canvas pixel buffer = PIXI coord space × DPR. The PIXI coord space
+    // (screen.width) can be larger than the viewport on a small phone where
+    // fieldZoom > 1; the browser scales the buffer down to the CSS box.
+    const expectedCanvasW = Math.round(info.screenW * info.resolution);
     if (Math.abs(info.canvasW - expectedCanvasW) > 1) {
-      throw new Error(`canvas physical/CSS mismatch: canvasW=${info.canvasW} vs cssW=${info.cssW} × resolution=${info.resolution} (expected ~${expectedCanvasW})`);
+      throw new Error(`canvas physical/PIXI mismatch: canvasW=${info.canvasW} vs screenW=${info.screenW} × resolution=${info.resolution} (expected ~${expectedCanvasW})`);
+    }
+    // Catch the "canvas overflows the viewport" class of bugs (fieldZoom × viewport
+    // accidentally became the canvas CSS box, pushing all cards off-screen).
+    if (Math.abs(info.cssW - info.innerW) > 5) {
+      throw new Error(`canvas CSS width ${info.cssW} should match window.innerWidth ${info.innerW} (PIXI coord space stays larger via screen.width=${info.screenW})`);
+    }
+    if (Math.abs(info.cssH - info.innerH) > 5) {
+      throw new Error(`canvas CSS height ${info.cssH} should match window.innerHeight ${info.innerH}`);
     }
 
     // 6. No unexpected console / page errors
