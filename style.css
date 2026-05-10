@@ -57,12 +57,28 @@
 		min-height: 56px !important;
 		min-width: 96px !important;
 		font-size: 16px !important;
-		padding: 12px 18px !important;
+		padding-top: 12px !important;
+		padding-bottom: 12px !important;
+		padding-left: 18px !important;  /* override the global 0.8em rule below */
+		padding-right: 18px !important;
 		flex: 1 1 auto;
 		max-width: calc(50% - 8px); /* two per row on the smallest phones */
 	}
-	/* The auto-continue toggle is decorative; let it shrink. */
-	#footer #autocontinuebox { flex: 0 0 auto; max-width: none; }
+	/* The auto-continue toggle is rendered with inline `position: fixed;
+	   left: 100%; top: -6px;` (utility.js#AutoContinueButtonHTML).
+	   Without `transform: none` it'd anchor to the footer; with it the
+	   footer is no longer a containing block, so it'd anchor to the
+	   viewport and end up off-screen on phones. Force it back to
+	   in-flow positioning so it stays inside the footer band. */
+	#footer .autocontinue, #footer #autocontinue {
+		position: static !important;
+		left: auto !important;
+		top: auto !important;
+		height: 56px !important;
+		min-width: 56px !important;
+		max-width: none;
+		flex: 0 0 auto;
+	}
 }
 /* Landscape phones (wider than 480 but short, like iPhone 13 Pro 844×390):
    give buttons more breathing room horizontally — single row is fine. */
