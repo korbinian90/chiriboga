@@ -22,6 +22,15 @@
 }
 #footer .button, #footer button {
 	padding-right: 1.7em !important; /* A few pixels more space on the right for chevron/icon */
+	min-height: 44px; /* iOS HIG floor — these buttons are the primary tap targets while playing */
+	min-width: 64px;
+	font-size: 14px;
+}
+/* On phones the 430px-wide footer overflows a 390px viewport. Cap to
+   the viewport so the right edge stays inside the screen. */
+@media (max-width: 480px) {
+	#footer { max-width: calc(100vw - env(safe-area-inset-left,0) - env(safe-area-inset-right,0)); width: auto; padding: 6px 10px !important; }
+	#footer .button, #footer button { min-height: 48px; min-width: 56px; }
 }
 /* --- OVERRIDE: Footer button hover/active text and icon color --- */
 #footer .button:hover, #footer .button:active,
