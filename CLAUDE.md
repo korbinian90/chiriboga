@@ -59,9 +59,6 @@ so PIXI textures stay CORS-clean.
 
 Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
-- [ ] **`touch-action: none`** on the canvas + `e.preventDefault()` in the
-  canvas's `touchstart` listener so the browser doesn't fire double-tap-zoom
-  or rubber-band scroll over the play area.
 - [ ] **Safe-area-inset.** Anything `position: fixed` at top/bottom in
   `style.css` needs `padding-top: env(safe-area-inset-top)` etc., or the UI
   clips behind the iPhone notch / home indicator. Affects `#footer`,
@@ -193,6 +190,16 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — Disable native touch gestures on the play canvas.
+  `style.css`: added `touch-action: none` to the `canvas` rule.
+  `cardrenderer.js`: added a `touchstart` listener with `e.preventDefault()`
+  on `this.app.view` (`{passive: false}` so the preventDefault actually
+  applies) immediately after the canvas is appended. CSS is the modern
+  path; the JS listener is the iOS-Safari-pre-13.4 fallback. Verified
+  in headless Chromium: synthesized `touchstart` is `defaultPrevented`,
+  and a real Playwright tap still reaches PIXI's interaction plugin
+  (the test tap on Keep advanced the game to "Corporation's Turn
+  Begins"), so PIXI input is unaffected.
 - 2026-05-10 — HiDPI PIXI canvas (`cardrenderer/cardrenderer.js`).
   `PIXI.Application` now constructed with `resolution: devicePixelRatio`
   + `autoResize: true` (PIXI v4 calls it `autoResize`, *not* `autoDensity`

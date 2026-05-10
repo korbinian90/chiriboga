@@ -1540,6 +1540,14 @@ var CardRenderer = {
       container.y = h / 2;
       document.body.appendChild(this.app.view); //just during creation, in init.js we move it straight away
 
+      //prevent browser-native touch gestures (double-tap zoom, rubber-band
+      //scroll, pull-to-refresh) over the play area. CSS touch-action:none
+      //handles this on modern browsers; this is a fallback for older iOS
+      //Safari (<13.4) which ignored touch-action.
+      this.app.view.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+      }, { passive: false });
+
       this.loadingTextures = [];
       this.loadingMax = 1;
 
