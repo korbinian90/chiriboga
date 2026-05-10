@@ -1093,7 +1093,7 @@ function Render() {
   $("#menubar").css("transform-origin", "top left");
   $("#menubar").css("transform", "scale(" + interfaceScale + ")");
   $("#history-wrapper").css("width", interfaceScale * 56 + "px");
-  $("#history-wrapper").css("top", interfaceScale * 65 + "px");
+  $("#history-wrapper").css("top", "calc(" + (interfaceScale * 65) + "px + env(safe-area-inset-top, 0px))");
   
   if ($('#largerhistory').prop('checked')) {
     $("#history-wrapper").css("transform-origin", "top right");

@@ -551,8 +551,8 @@ canvas {
 #footer {
  z-index:2;
  position:fixed;
- bottom:0;
- left:0;
+ bottom:env(safe-area-inset-bottom,0);
+ left:env(safe-area-inset-left,0);
  margin:0;
  height:65px;
  width:430px;
@@ -591,8 +591,8 @@ canvas {
 
 #menubar {
  position:fixed;
- top:0;
- left:0;
+ top:env(safe-area-inset-top,0);
+ left:env(safe-area-inset-left,0);
  height:76px;
  background:var(--bg-dark);
  width:auto;
@@ -801,8 +801,8 @@ canvas {
 /* my approach, since we only need to see that while hovering the history entry, is to temporarily expand the left padding and margin (toggle from 100% and -100% to 0) in javascript*/
 #history-wrapper {
  position:fixed;
- top:65px;
- right:0;
+ top:calc(65px + env(safe-area-inset-top,0));
+ right:env(safe-area-inset-right,0);
  width:56px;
  height:100%;
  float:right;
@@ -927,8 +927,8 @@ canvas {
 
 .fullscreen-button {
 	position:fixed;
-	top:0;
-	right:0;
+	top:env(safe-area-inset-top,0);
+	right:env(safe-area-inset-right,0);
 	margin-top:10px;
 	margin-right:5px;
 	width:44px;
