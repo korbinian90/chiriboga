@@ -648,7 +648,9 @@
 							if (iconName === 'TRASH') iconName = 'TRASH_ABILITY';
 							if (iconName === 'RECURRING-CREDIT' || iconName === 'RECURRING_CREDIT') iconName = 'RECURRING_CREDIT';
 							if (iconName === 'BAD-PUBLICITY' || iconName === 'BAD_PUBLICITY') iconName = 'BAD_PUBLICITY';
-							return '<img src="images/nsg/NSG_' + iconName + '.svg" class="card-icon" alt="' + word + '">';
+							// HB / Jinteki are PNGs (originals were 3.9 MB / 343 KB embedded-raster SVGs).
+							var iconExt = (iconName === 'HB' || iconName === 'JINTEKI') ? 'png' : 'svg';
+							return '<img src="images/nsg/NSG_' + iconName + '.' + iconExt + '" class="card-icon" alt="' + word + '">';
 						});
 						// Replace newlines with <br> tags (handle both literal \n and actual newlines)
 						cardText = cardText.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');

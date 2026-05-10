@@ -53,13 +53,7 @@ so PIXI textures stay CORS-clean.
 
 ### A. Engine load reliability (small, ship one at a time)
 
-- [ ] **Bundle deferred big SVGs.** `NSG_HB.svg` (3.9 MB, base64-embedded
-  raster) and `NSG_JINTEKI.svg` (343 KB) were dropped from the UI-sprite
-  commit because of push-size limits. Both are decklauncher-only (in-card-
-  text icon replacement, `<img>` tags). Either re-author as actual SVG
-  geometry, convert to PNG at display size (~64×64), or commit as-is in a
-  separate push and accept the weight. Without these, HB/Jinteki faction
-  icons render as broken-image in the deck builder.
+(empty — Section A items shipped. Move on to Section B/C/D.)
 
 ### B. Mobile responsiveness (Phase A from earlier audit — mechanical, no design decisions)
 
@@ -208,6 +202,14 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — Bundle the deferred HB/Jinteki faction icons as PNGs.
+  Originals were 3.9 MB / 343 KB SVGs that wrapped embedded raster.
+  Re-rendered at 256×256 PNG with cairosvg → 41 KB / 44 KB. Updated the
+  three icon-template sites (`decklauncher.php:653`, `gauntlet.php:110`,
+  `gauntlet.php:3656`) to use `.png` for HB/Jinteki and `.svg` for
+  everything else. Display is at ~1.2em with a `brightness(0) invert(1)`
+  filter, so PNG vs SVG is visually identical at that size. ~4.1 MB
+  saved vs. the original assets.
 - 2026-05-10 — SW pre-warm for tutorial card art (`sw.js`). Decoded the
   two System Gateway starter decks from index.php:443-444 with LZString
   → 34 unique 5-digit codes. Hardcoded into `TUTORIAL_PREWARM_CODES`
