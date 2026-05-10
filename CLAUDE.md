@@ -59,9 +59,6 @@ so PIXI textures stay CORS-clean.
 
 Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
-- [ ] **HiDPI canvas.** PIXI Application is created without `resolution` or
-  `autoDensity`. On a 3× retina phone, text is upscaled and soft. Pass
-  `{ resolution: window.devicePixelRatio, autoDensity: true, transparent: true }`.
 - [ ] **`touch-action: none`** on the canvas + `e.preventDefault()` in the
   canvas's `touchstart` listener so the browser doesn't fire double-tap-zoom
   or rubber-band scroll over the play area.
@@ -196,6 +193,19 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — HiDPI PIXI canvas (`cardrenderer/cardrenderer.js`).
+  `PIXI.Application` now constructed with `resolution: devicePixelRatio`
+  + `autoResize: true` (PIXI v4 calls it `autoResize`, *not* `autoDensity`
+  — that's the v5 name, CLAUDE.md was wrong; corrected here). The
+  `view.width/height` is then `logical × DPR`, but `view.style.width/height`
+  is set back to logical, so layout is unaffected and text renders sharp
+  at 2×/3×. Side effect: `renderer.width` returns physical pixels in v4,
+  so the 8 layout sites that previously read `cardRenderer.app.renderer.width/height`
+  were migrated to `cardRenderer.app.screen.width/height` (logical) —
+  otherwise card-tween end-positions and pixi_playY checks would all be
+  off by ×DPR. Verified with a headless-Chromium iPhone 13 Pro emulation:
+  canvas 1170×1992 / CSS 390×664, rotate-to-landscape reflowed correctly,
+  no layout regressions, modal dismissed in ms.
 - 2026-05-10 — PIXI canvas resize listener
   (`cardrenderer/cardrenderer.js`). The existing `window.onresize`
   hook only re-ran the layout callback; it never resized the renderer

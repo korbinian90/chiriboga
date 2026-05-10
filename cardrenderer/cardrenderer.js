@@ -1258,14 +1258,14 @@ var CardRenderer = {
             if (pixi_holdZoom) {
               //i.e., on mobile
               var arbitraryExtraSpace = 100;
-              if (this.storedPosition.x < cardRenderer.app.renderer.width * 0.5)
+              if (this.storedPosition.x < cardRenderer.app.screen.width * 0.5)
                 this.sprite.x =
-                  cardRenderer.app.renderer.width -
+                  cardRenderer.app.screen.width -
                   0.5 * this.sprite.width -
                   arbitraryExtraSpace;
               else
                 this.sprite.x = 0.5 * this.sprite.width + arbitraryExtraSpace;
-              this.sprite.y = 0.5 * cardRenderer.app.renderer.height;
+              this.sprite.y = 0.5 * cardRenderer.app.screen.height;
             }
           }
           //prevent card going off the screen (except when can't see front e.g. choosing card for access in Corp hand)
@@ -1274,18 +1274,18 @@ var CardRenderer = {
 				this.sprite.x = 0.5 * this.sprite.width;
 			  if (
 				this.sprite.x + 0.5 * this.sprite.width >
-				cardRenderer.app.renderer.width
+				cardRenderer.app.screen.width
 			  )
 				this.sprite.x =
-				  cardRenderer.app.renderer.width - 0.5 * this.sprite.width;
+				  cardRenderer.app.screen.width - 0.5 * this.sprite.width;
 			  if (this.sprite.y - 0.5 * this.sprite.height < 0)
 				this.sprite.y = 0.5 * this.sprite.height;
 			  if (
 				this.sprite.y + 0.5 * this.sprite.height >
-				cardRenderer.app.renderer.height
+				cardRenderer.app.screen.height
 			  )
 				this.sprite.y =
-				  cardRenderer.app.renderer.height - 0.5 * this.sprite.height;
+				  cardRenderer.app.screen.height - 0.5 * this.sprite.height;
 		  }
         }
 
@@ -1524,7 +1524,15 @@ var CardRenderer = {
     constructor(resizeCallback, accessibilityMode="default") {
       var w = window.innerWidth;
       var h = window.innerHeight;
-      this.app = new PIXI.Application(w, h, { transparent: true });
+      //render at native pixel density on retina phones (text was visibly
+      //soft at devicePixelRatio > 1). PIXI v4 uses autoResize (renamed to
+      //autoDensity in v5); it scales the canvas's CSS size back down so
+      //the layout is unaffected.
+      this.app = new PIXI.Application(w, h, {
+        transparent: true,
+        resolution: window.devicePixelRatio || 1,
+        autoResize: true,
+      });
       var container = this.app.stage;
       container.pivot.x = w / 2;
       container.pivot.y = h / 2;
@@ -2514,5 +2522,5 @@ function pixi_playThreshold(cardToPlay) {
   //nothing yet? maybe drag from hand to field
   var y = cardRenderer.MousePosition().y;
   if (activePlayer == corp) return y > pixi_playY;
-  return y < cardRenderer.app.renderer.height - pixi_playY;
+  return y < cardRenderer.app.screen.height - pixi_playY;
 }
