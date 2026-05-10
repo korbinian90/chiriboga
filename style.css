@@ -85,6 +85,53 @@
 @media (orientation: landscape) and (max-height: 500px) {
 	#footer .button, #footer button { max-width: none; }
 }
+
+/* Same fix for the rest of the chrome: init.js scales #menubar / #header
+   / .fullscreen-button by interfaceScale (~0.49 in landscape, ~0.37 in
+   portrait) to compensate for fieldZoom on the play canvas. That makes
+   the MENU / deck-info / rulebook / fullscreen / corner buttons tiny on
+   phones (15×12 px in some states). Defeat the scale on phones so the
+   buttons render at their native CSS size, matching the footer fix. */
+@media (max-width: 480px), (max-height: 500px) {
+	#menubar {
+		transform: none !important;
+		transform-origin: top left !important;
+		padding: 4px !important;
+		gap: 6px !important;
+		max-width: 70vw;
+		height: auto !important;
+		min-height: 56px !important;
+	}
+	#header {
+		transform: none !important;
+		transform-origin: top right !important;
+		max-width: 45vw !important; /* phone narrow viewport: keep header out of the score-pill area */
+		min-width: 0 !important;
+		width: auto !important;
+		height: auto !important;
+		min-height: 44px !important;
+		font-size: 13px !important;
+		padding: 6px 10px !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		white-space: normal !important;
+		line-height: 1.15 !important;
+	}
+	#header h2, #header h3 { font-size: 13px !important; margin: 0 !important; }
+	.fullscreen-button {
+		transform: none !important;
+		width: 48px !important;
+		height: 48px !important;
+	}
+	#menubar .menu-trigger,
+	#menubar .deck-info-button,
+	#menubar .rulebook-button,
+	#menubar .debug-menu-button {
+		min-height: 48px !important;
+		min-width: 48px !important;
+		font-size: 13px !important;
+	}
+}
 /* --- OVERRIDE: Footer button hover/active text and icon color --- */
 #footer .button:hover, #footer .button:active,
 #footer button:hover, #footer button:active {
