@@ -1063,6 +1063,13 @@ function Render() {
   var oldH = h;
   h *= fieldZoom;
   cardRenderer.app.renderer.resize(w, h);
+  // PIXI v4 autoResize sets view.style.width/height to the resize args
+  // (= w*fieldZoom). On phones where fieldZoom > 1 that overflows the
+  // viewport and pushes cards off-screen. Restore the canvas CSS box to
+  // the actual viewport so the browser scales the larger PIXI coordinate
+  // space down into it (the original pre-HiDPI design).
+  cardRenderer.app.view.style.width = oldW + "px";
+  cardRenderer.app.view.style.height = oldH + "px";
   //correct stage positioning after zoom
   if (viewingPlayer == corp) {
     cardRenderer.app.stage.x += w - oldW;

@@ -190,6 +190,19 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — Fix canvas-overflows-viewport regression from PR #9.
+  PIXI v4 `autoResize: true` makes `renderer.resize(t, e)` also set
+  `view.style.width/height = t/e + "px"`. But `init.js` resizes the
+  renderer to `innerWidth × fieldZoom` to expand the PIXI coord space
+  for layout — autoResize then made the *CSS* box that big too, so on
+  any phone where `fieldZoom > 1` the canvas overflowed the viewport
+  and runner cards (rendered at the bottom of the larger logical
+  space) ended up off-screen. Restored the canvas CSS box to
+  `innerWidth × innerHeight` after the resize call so the browser
+  scales the PIXI buffer down into the viewport (the original pre-
+  HiDPI design). Smoke test now navigates straight to tutorial 7
+  (full deck, fieldZoom > 1) and asserts canvas CSS matches
+  innerWidth/innerHeight to catch this class of regression.
 - 2026-05-10 — Disable native touch gestures on the play canvas.
   `style.css`: added `touch-action: none` to the `canvas` rule.
   `cardrenderer.js`: added a `touchstart` listener with `e.preventDefault()`
