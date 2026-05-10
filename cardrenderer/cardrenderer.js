@@ -2410,6 +2410,16 @@ function pixi_onDragEnd(event) {
   //note this is all in the context of sprite
   pixi_mousePosition = event.data.getLocalPosition(this.parent);
   this.alpha = 1;
+  // Haptic feedback: a stronger pulse if the drop met the play threshold
+  // (likely resolved into a play / install / run); a soft tap otherwise so
+  // the user still feels the release. EngineVibrate() is a no-op on
+  // unsupported browsers.
+  if (this.dragging && typeof EngineVibrate === 'function') {
+    if (typeof pixi_playThreshold === 'function' && pixi_playThreshold(pixi_draggingCard))
+      EngineVibrate(HAPTIC.play);
+    else
+      EngineVibrate(HAPTIC.tap);
+  }
   this.dragging = false;
   pixi_draggingCard = null;
   // set the interaction data to null

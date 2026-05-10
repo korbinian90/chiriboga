@@ -65,6 +65,26 @@ var rewindStates = [];
 //for auto-skip paid ability windows
 var autoContinue = false;
 var autoContinueLimit = 1.0;
+
+// Haptic feedback: short tactile taps on key gameplay events for phones
+// that support navigator.vibrate (Android Chrome / Firefox / Edge; iOS
+// Safari ignores). Free no-op everywhere else. Gated by hapticFeedback
+// so a settings toggle can flip it later.
+var hapticFeedback = true;
+function EngineVibrate(pattern) {
+  try {
+    if (!hapticFeedback) return;
+    if (typeof navigator === 'undefined' || !navigator.vibrate) return;
+    navigator.vibrate(pattern);
+  } catch (e) { /* swallow — haptic is best-effort */ }
+}
+// Common patterns. Keep them short so they're felt as taps, not buzzes.
+var HAPTIC = {
+  tap:    10,           // primary action button (Continue, etc.)
+  play:   [12, 30, 12], // a card resolved (install/play)
+  score:  [20, 40, 60], // agenda scored
+  damage: [40, 60, 40], // took damage / lost run
+};
 var autoContinueTimer = 0.0;
 //animate the thinking text to be clear the game isn't frozen
 setInterval(function () { var tstr=$('#thinking').html(); if (tstr) { if (tstr.length < 11) $('#thinking').append("."); else $('#thinking').html("Thinking"); } }, 1000);
@@ -1721,6 +1741,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var btn = document.getElementById('hud-continue');
   if (!btn) return;
   btn.addEventListener('click', function (e) {
+    EngineVibrate(HAPTIC.tap);
     // Click whatever single primary button the engine has in #footer.
     var pid = btn.dataset.primaryId;
     var primary = (pid && document.getElementById(pid))
