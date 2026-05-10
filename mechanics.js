@@ -1640,6 +1640,7 @@ function Score(card, afterScore, context) {
   intended.score = card; //if callback sets this to null, the score will not happen
   OpportunityForAvoidPrevent(runner, "responsePreventableScore", [], function () {
     if (intended.score == null) return;
+    if (typeof EngineVibrate === 'function') EngineVibrate(HAPTIC.score);
     MoveCard(intended.score, corp.scoreArea);
     intended.score.faceUp = true;
     if (runner.AI != null) runner.AI.LoseInfoAboutHQCards(intended.score);
@@ -1684,6 +1685,7 @@ function Steal() {
   OpportunityForAvoidPrevent(corp, "responsePreventableSteal", [], function () {
     ResolveAccess();
     if (intended.steal == null) return;
+    if (typeof EngineVibrate === 'function') EngineVibrate(HAPTIC.score);
 	var stolenFromString = "remote";
 	if (attackedServer == corp.HQ.cards) stolenFromString = "HQ";
 	else if (attackedServer == corp.RnD.cards) stolenFromString = "R&D";
