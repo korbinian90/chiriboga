@@ -10,3 +10,8 @@ carddata/Netrunner Comprehensive Rules (v25.08).pdf
 Netrunner Comprehensive Rules (v25.08).pdf
 .vscode/
 .vscode/sftp.json
+
+# CI build output
+_site/
+tests/screenshots/
+node_modules/

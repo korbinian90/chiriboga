@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev]
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: PHP syntax check
+        run: |
+          set -e
+          for f in *.php; do
+            php -l "$f"
+          done
+
+      - name: JS syntax check
+        # Skip the two minified vendor bundles — node --check chokes on them and
+        # they're not our code anyway.
+        run: |
+          set -e
+          find . -name '*.js' \
+            -not -path './.git/*' \
+            -not -path './node_modules/*' \
+            -not -path './_site/*' \
+            -not -name 'pixi.min.js' \
+            -not -name 'lz-string.min.js' \
+            -print0 | xargs -0 -n1 node --check
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Mirrors the relevant subset of pages.yml — just enough to make the
+      # engine load chain identical to a real Pages deploy. Skips the IP
+      # swap, security <meta> tags, manifest fix, and 404.html since they
+      # don't affect engine init.
+      - name: Build _site
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            --exclude='*.php' \
+            --exclude='.htaccess' \
+            --exclude='node_modules' \
+            ./ _site/
+          for f in index engine decklauncher gauntlet; do
+            php -f "${f}.php" > "_site/${f}.html"
+          done
+          # Rewrite cross-page links from .php to .html
+          find _site -type f \( -name '*.js' -o -name '*.html' \) -print0 \
+            | xargs -0 sed -i \
+                -e 's/index\.php/index.html/g' \
+                -e 's/engine\.php/engine.html/g' \
+                -e 's/decklauncher\.php/decklauncher.html/g' \
+                -e 's/gauntlet\.php/gauntlet.html/g'
+          # PIXI tolerate-missing-card-art patch (same as pages.yml)
+          PATCH='<script>(function(){if(typeof PIXI==="undefined"||!PIXI.Texture||!PIXI.Texture.fromImage)return;var o=PIXI.Texture.fromImage;PIXI.Texture.fromImage=function(){var t=o.apply(this,arguments);if(t\&\&t.baseTexture)t.baseTexture.on("error",function(){t.valid=true;});return t;};})();</script>'
+          for f in _site/engine.html _site/decklauncher.html _site/gauntlet.html; do
+            sed -i "s#<script src=\"cardrenderer/pixi.min.js[^\"]*\"></script>#&${PATCH}#" "$f"
+          done
+
+      - name: Install Playwright
+        run: |
+          npm install --silent --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Run smoke test
+        run: node tests/smoke.js
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: tests/screenshots/
+          if-no-files-found: ignore
