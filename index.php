@@ -1,5 +1,8 @@
 <?php
 $version = "0.6.13-BETA";
+// Short git SHA from GitHub Actions env (set automatically by the
+// pages.yml deploy). Falls back to "dev" for local PHP rendering.
+$buildSha = substr(getenv('GITHUB_SHA') ?: 'dev', 0, 7);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -240,7 +243,7 @@ $version = "0.6.13-BETA";
           </div>
           <div class="spacer-grow"></div>
           <div class="meta-stack landscape-only">
-            <div class="version">BUILD <?php echo $version; ?> // 2077.<?php echo date('m.d'); ?></div>
+            <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> // 2077.<?php echo date('m.d'); ?></div>
             <div class="status-bar">
               <span class="status-item" style="cursor:pointer;" onclick="openCredits()">CREDITS</span>
               <span class="status-item" id="threat-level">THREAT LEVEL: <span id="threat-color">1</span></span>
@@ -468,7 +471,7 @@ $version = "0.6.13-BETA";
         </div>
 
         <div class="meta-stack portrait-only">
-          <div class="version">BUILD <?php echo $version; ?> // 2077.<?php echo date('m.d'); ?></div>
+          <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> // 2077.<?php echo date('m.d'); ?></div>
           <div class="status-bar">
             <span class="status-item" style="cursor:pointer;" onclick="openCredits()">CREDITS</span>
             <span class="status-item" id="threat-level-portrait">THREAT LEVEL: <span id="threat-color-portrait">1</span></span>
