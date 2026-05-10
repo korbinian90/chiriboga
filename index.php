@@ -12,7 +12,7 @@ $buildTime = gmdate('H:i') . ' UTC';
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Netrunner: Solo Mode</title>
   <link href="images/favicon.ico" rel="icon">
   <link rel="manifest" href="manifest.json">
@@ -109,19 +109,9 @@ $buildTime = gmdate('H:i') . ' UTC';
   <script src="deck/lz-string.min.js?<?php echo filemtime('deck/lz-string.min.js'); ?>"></script>
   <script src="deck/seedrandom.min.js?<?php echo filemtime('deck/seedrandom.min.js'); ?>"></script>
   <script>
-    // iOS viewport fix: reset zoom when app returns from background
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        // Page is visible again - reset viewport zoom on iOS
-        var viewport = document.querySelector('meta[name="viewport"]');
-        if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
-        }
-        // Force layout recalculation
-        document.body.style.zoom = 1;
-        window.scrollTo(0, 0);
-      }
-    });
+    // (Removed the visibilitychange handler that re-clamped maximum-scale=1
+    // and forced document.body.style.zoom=1. With pinch-zoom re-enabled,
+    // those resets fought the user every time the tab regained focus.)
     
     var cardSet = []; // prepare to receive card definitions
     var setIdentifiers = []; // set identifiers
