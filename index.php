@@ -3,6 +3,10 @@ $version = "0.6.13-BETA";
 // Short git SHA from GitHub Actions env (set automatically by the
 // pages.yml deploy). Falls back to "dev" for local PHP rendering.
 $buildSha = substr(getenv('GITHUB_SHA') ?: 'dev', 0, 7);
+// UTC date and time of the PHP render. On the GitHub Pages deploy that's
+// the build time of the artifact running in the user's browser.
+$buildDate = gmdate('Y-m-d');
+$buildTime = gmdate('H:i') . ' UTC';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -243,7 +247,7 @@ $buildSha = substr(getenv('GITHUB_SHA') ?: 'dev', 0, 7);
           </div>
           <div class="spacer-grow"></div>
           <div class="meta-stack landscape-only">
-            <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> // 2077.<?php echo date('m.d'); ?></div>
+            <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> · <?php echo $buildDate; ?> <?php echo $buildTime; ?></div>
             <div class="status-bar">
               <span class="status-item" style="cursor:pointer;" onclick="openCredits()">CREDITS</span>
               <span class="status-item" id="threat-level">THREAT LEVEL: <span id="threat-color">1</span></span>
@@ -470,8 +474,17 @@ $buildSha = substr(getenv('GITHUB_SHA') ?: 'dev', 0, 7);
           </div>
         </div>
 
+        <!-- Always-visible build badge so the running version is obvious on
+             every viewport (the meta-stack is hidden by media queries in
+             portrait on small phones). -->
+        <div class="build-badge" title="<?php echo htmlspecialchars($buildSha); ?> built <?php echo $buildDate; ?> <?php echo $buildTime; ?>">
+          <span class="build-badge-version">v<?php echo $version; ?></span>
+          <span class="build-badge-sha"><?php echo $buildSha; ?></span>
+          <span class="build-badge-time"><?php echo $buildDate; ?> <?php echo $buildTime; ?></span>
+        </div>
+
         <div class="meta-stack portrait-only">
-          <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> // 2077.<?php echo date('m.d'); ?></div>
+          <div class="version">BUILD <?php echo $version; ?> · <?php echo $buildSha; ?> · <?php echo $buildDate; ?> <?php echo $buildTime; ?></div>
           <div class="status-bar">
             <span class="status-item" style="cursor:pointer;" onclick="openCredits()">CREDITS</span>
             <span class="status-item" id="threat-level-portrait">THREAT LEVEL: <span id="threat-color-portrait">1</span></span>
