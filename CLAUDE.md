@@ -53,11 +53,6 @@ so PIXI textures stay CORS-clean.
 
 ### A. Engine load reliability (small, ship one at a time)
 
-- [ ] **Modal-dismiss safety timeout** in `cardrenderer/cardrenderer.js:1686-1714`.
-  Currently the splice loop waits forever for textures to go valid. Add a
-  fallback that hides `#loading` and calls `StartGame()` if the modal has
-  been visible >8 s, regardless of `loadingTextures.length`. Belt-and-
-  suspenders for any future broken-image regression.
 - [ ] **SW pre-warm** for tutorial card art. On `install`, fetch the ~60
   cards used by tutorials 7+8 (deck params decoded from `index.php:443-444`
   with LZString) and put them in `chiriboga-cards-v1` so a cold visit to a
@@ -218,6 +213,14 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+- 2026-05-10 — Modal-dismiss safety timeout in
+  `cardrenderer/cardrenderer.js` (added at the top of the ticker setup,
+  just before the existing texture-load splice loop). Independent
+  `setTimeout(8000)` hides `#loading` and calls `StartGame()` if the
+  modal is still visible 8 s after the renderer is constructed —
+  survives a stalled ticker since it's not on the ticker. Logs a
+  console.warn with the count of still-pending textures so a future
+  regression is debuggable.
 - 2026-05-09 — `70f339c` Bundle UI sprites; `0371331` carve gitignore so
   only card art is excluded. Fixes "Loading 0%" hang on Pages.
   (Originally PR #4; merged to dev.)
