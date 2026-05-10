@@ -59,10 +59,6 @@ so PIXI textures stay CORS-clean.
 
 Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
-- [ ] **48 px touch targets** on small breakpoints. `style.css:2408` drops
-  buttons to `min-width: 80px; padding: 6px 8px` at 360 px wide; counter
-  badges to 16 px (`style.css:2368`). Apple HIG = 44 pt, Material = 48 dp.
-  Bump the small-breakpoint buttons/badges to ≥48 px square hit areas.
 - [ ] **`min-height: 100vh` → `100dvh`** in `style.css:1462` (the terminal
   frame). `100vh` overflows short phones (iPhone SE portrait ~667 px).
 - [ ] **Re-enable pinch-zoom.** `index.php:8` sets `user-scalable=no,
@@ -184,6 +180,7 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
+<<<<<<< HEAD
 - 2026-05-10 — Safe-area-inset on fixed UI chrome. `style.css`:
   `#footer` (`bottom`/`left`), `#menubar` (`top`/`left`),
   `#history-wrapper` (`top` via `calc(... + env(...))` since the
@@ -196,6 +193,19 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
   under the notch / home-indicator (`index.php` already had it).
   env() falls back to 0 on non-notch viewports, so existing layouts
   are unchanged. Smoke test green.
+=======
+- 2026-05-10 — 48 px hit targets on small-phone breakpoints (`style.css`
+  `@media (max-width: 480px)` and `@media (max-width: 360px)`, plus
+  the `@media (max-height: 768px)` block for the index landing-page
+  menu items). `.leftrow.buttons .button`, `#identityselect` /
+  `#preconselect` / `#deck`, `.count-badge`, and `.card-controls
+  button` got `min-height: 48px` at both breakpoints; menu items on
+  index.php went from 40 × 290 / 12 px to 48 × 290 / 14 px. Padding
+  bumped to fill, font sizes mostly unchanged so visual density at
+  481+ px is preserved. The previous values (24 - 40 px) were below
+  both Apple HIG (44 pt) and Material (48 dp) — fat-finger mis-tap
+  risk. Smoke test green.
+>>>>>>> 34f713f (Bump small-phone hit targets to 48px)
 - 2026-05-10 — Disable native touch gestures on the play canvas.
   `style.css`: added `touch-action: none` to the `canvas` rule.
   `cardrenderer.js`: added a `touchstart` listener with `e.preventDefault()`

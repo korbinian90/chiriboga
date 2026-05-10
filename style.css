@@ -2341,8 +2341,9 @@ select::-ms-expand { display: none; }
 	}
 	.leftrow { padding:8px; }
 	.leftrow.buttons { gap:6px; }
-	.leftrow.buttons .button { min-width:100px; font-size:12px; padding:8px 10px; }
-	#identityselect, #preconselect, #deck { font-size:12px; padding:8px 10px; }
+	/* 48px min hit area on phones — Apple HIG/Material, prevents fat-finger mis-taps. */
+	.leftrow.buttons .button { min-width:100px; min-height:48px; font-size:12px; padding:12px 10px; }
+	#identityselect, #preconselect, #deck { min-height:48px; font-size:12px; padding:8px 10px; }
 	.deck-stats { font-size:11px; padding:6px 8px; }
 	#cardcontainer .card-title { 
 		font-size:9px !important; 
@@ -2364,21 +2365,21 @@ select::-ms-expand { display: none; }
 	#cardcontainer .card-item::after {
 		display: none !important;
 	}
-	#cardcontainer .count-badge { 
-		font-size:16px; 
-		min-width:34px; 
-		min-height:34px; 
-		padding:4px 6px; 
+	#cardcontainer .count-badge {
+		font-size:16px;
+		min-width:48px;
+		min-height:48px;
+		padding:4px 6px;
 		/* Mobile paint fix: simplified transform for faster paint */
 		-webkit-transform: translate(-50%, -50%);
 		transform: translate(-50%, -50%);
 	}
-	#cardcontainer .card-controls button { 
-		flex:1; 
-		margin:0 1px !important; 
-		padding:4px 0 !important; 
-		font-size:13px !important; 
-		min-height:24px !important; 
+	#cardcontainer .card-controls button {
+		flex:1;
+		margin:0 1px !important;
+		padding:8px 0 !important;
+		font-size:13px !important;
+		min-height:48px !important;
 	}
 	#cardcontainer .card-controls { 
 		margin-top:1px !important; 
@@ -2406,8 +2407,9 @@ select::-ms-expand { display: none; }
 		row-gap:1px; 
 	}
 	.leftrow { padding:6px; }
-	.leftrow.buttons .button { min-width:80px; font-size:11px; padding:6px 8px; }
-	#identityselect, #preconselect, #deck { font-size:11px; padding:6px 8px; }
+	/* 48px min hit area on small phones — same rationale as the 480px block. */
+	.leftrow.buttons .button { min-width:80px; min-height:48px; font-size:11px; padding:12px 8px; }
+	#identityselect, #preconselect, #deck { min-height:48px; font-size:11px; padding:8px 8px; }
 	.deck-stats { font-size:10px; padding:4px 6px; }
 	#cardcontainer .card-title { 
 		font-size:8px; 
