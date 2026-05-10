@@ -26,11 +26,48 @@
 	min-width: 64px;
 	font-size: 14px;
 }
-/* On phones the 430px-wide footer overflows a 390px viewport. Cap to
-   the viewport so the right edge stays inside the screen. */
-@media (max-width: 480px) {
-	#footer { max-width: calc(100vw - env(safe-area-inset-left,0) - env(safe-area-inset-right,0)); width: auto; padding: 6px 10px !important; }
-	#footer .button, #footer button { min-height: 48px; min-width: 56px; }
+/* On phones, reposition the entire #footer to a full-width band along
+   the bottom edge so multi-option choice buttons (Mulligan/Keep, Run
+   targets, action chooser) are easy thumb targets — no longer crammed
+   into the bottom-left corner at ~24px height.
+
+   The HUD's #hud-continue stays at center-bottom for the single-button
+   case; this footer band sits in the same area when the engine has
+   multiple options to surface.
+
+   Critical: init.js applies `transform: scale(interfaceScale)` (~0.37
+   on phones) to compensate for the PIXI fieldZoom — without overriding
+   transform here, our 56px buttons would render as 21px on-screen. */
+@media (max-width: 480px), (max-height: 500px) {
+	#footer {
+		left: env(safe-area-inset-left, 0) !important;
+		right: env(safe-area-inset-right, 0) !important;
+		max-width: none !important;
+		width: auto !important;
+		min-height: 64px !important;
+		height: auto !important;
+		padding: 8px 12px !important;
+		gap: 8px !important;
+		flex-wrap: wrap !important;
+		justify-content: center !important;
+		border-top-right-radius: 0 !important;
+		transform: none !important; /* defeat the inline scale() from init.js so phone-sized buttons render at native size */
+	}
+	#footer .button, #footer button {
+		min-height: 56px !important;
+		min-width: 96px !important;
+		font-size: 16px !important;
+		padding: 12px 18px !important;
+		flex: 1 1 auto;
+		max-width: calc(50% - 8px); /* two per row on the smallest phones */
+	}
+	/* The auto-continue toggle is decorative; let it shrink. */
+	#footer #autocontinuebox { flex: 0 0 auto; max-width: none; }
+}
+/* Landscape phones (wider than 480 but short, like iPhone 13 Pro 844×390):
+   give buttons more breathing room horizontally — single row is fine. */
+@media (orientation: landscape) and (max-height: 500px) {
+	#footer .button, #footer button { max-width: none; }
 }
 /* --- OVERRIDE: Footer button hover/active text and icon color --- */
 #footer .button:hover, #footer .button:active,
