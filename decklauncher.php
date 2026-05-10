@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 		<title>Netrunner: Solo Mode</title>
 		<link href="images/favicon.ico" rel="icon">
 		<?php echo '<link rel="stylesheet" href="jquery/jquery-ui.css?' . filemtime('jquery/jquery-ui.css') . '" />'; ?>

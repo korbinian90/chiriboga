@@ -59,12 +59,6 @@ so PIXI textures stay CORS-clean.
 
 Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
-- [ ] **Safe-area-inset.** Anything `position: fixed` at top/bottom in
-  `style.css` needs `padding-top: env(safe-area-inset-top)` etc., or the UI
-  clips behind the iPhone notch / home indicator. Affects `#footer`,
-  `#menubar`, `#history-wrapper`, `.fullscreen-button`. Add
-  `viewport-fit=cover` to the viewport meta in `engine.php:5` (already
-  present in `index.php:8`).
 - [ ] **48 px touch targets** on small breakpoints. `style.css:2408` drops
   buttons to `min-width: 80px; padding: 6px 8px` at 360 px wide; counter
   badges to 16 px (`style.css:2368`). Apple HIG = 44 pt, Material = 48 dp.
@@ -190,19 +184,18 @@ Local audit of `/tmp/chiriboga-shots*/` (now gone, but findings are below).
 
 ## Done (recent → older)
 
-- 2026-05-10 — Fix canvas-overflows-viewport regression from PR #9.
-  PIXI v4 `autoResize: true` makes `renderer.resize(t, e)` also set
-  `view.style.width/height = t/e + "px"`. But `init.js` resizes the
-  renderer to `innerWidth × fieldZoom` to expand the PIXI coord space
-  for layout — autoResize then made the *CSS* box that big too, so on
-  any phone where `fieldZoom > 1` the canvas overflowed the viewport
-  and runner cards (rendered at the bottom of the larger logical
-  space) ended up off-screen. Restored the canvas CSS box to
-  `innerWidth × innerHeight` after the resize call so the browser
-  scales the PIXI buffer down into the viewport (the original pre-
-  HiDPI design). Smoke test now navigates straight to tutorial 7
-  (full deck, fieldZoom > 1) and asserts canvas CSS matches
-  innerWidth/innerHeight to catch this class of regression.
+- 2026-05-10 — Safe-area-inset on fixed UI chrome. `style.css`:
+  `#footer` (`bottom`/`left`), `#menubar` (`top`/`left`),
+  `#history-wrapper` (`top` via `calc(... + env(...))` since the
+  base is `65px`, `right`), and `.fullscreen-button` (`top`/`right`)
+  now anchor to `env(safe-area-inset-*, 0)`. `init.js:1089` writes
+  `#history-wrapper.top` at runtime, so it was migrated to a
+  `calc(...)` string too — otherwise it'd overwrite the CSS env
+  fallback. `engine.php` / `decklauncher.php` / `gauntlet.php` viewport
+  meta tags now include `viewport-fit=cover` so iOS draws content
+  under the notch / home-indicator (`index.php` already had it).
+  env() falls back to 0 on non-notch viewports, so existing layouts
+  are unchanged. Smoke test green.
 - 2026-05-10 — Disable native touch gestures on the play canvas.
   `style.css`: added `touch-action: none` to the `canvas` rule.
   `cardrenderer.js`: added a `touchstart` listener with `e.preventDefault()`

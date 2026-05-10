@@ -1093,7 +1093,7 @@ function Render() {
   $("#menubar").css("transform-origin", "top left");
   $("#menubar").css("transform", "scale(" + interfaceScale + ")");
   $("#history-wrapper").css("width", interfaceScale * 56 + "px");
-  $("#history-wrapper").css("top", interfaceScale * 65 + "px");
+  $("#history-wrapper").css("top", "calc(" + (interfaceScale * 65) + "px + env(safe-area-inset-top, 0px))");
   
   if ($('#largerhistory').prop('checked')) {
     $("#history-wrapper").css("transform-origin", "top right");
@@ -1108,8 +1108,13 @@ function Render() {
   $(".historyentry").css("height", interfaceScale * 50 + "px");
   $(".historyentry").css("width", interfaceScale * 50 + "px");
   $(".fullscreen-button").css("transform-origin", "top right");
-  //scale doesn't affect margin so we do that ourselves here
-  $(".fullscreen-button").css("transform", "translate(5px, -10px) scale(" + interfaceScale + ") translate(-5px, 10px)");
+  // Plain scale around the top-right corner. The previous form,
+  //   translate(5,-10) scale(s) translate(-5,10)
+  // was a margin compensation, but for s < 1 it adds a net upward
+  // translate (~10*(1-s) px) which can pull the button up past the
+  // safe-area-inset on notched phones with no inset. Accept a small
+  // visual snug instead.
+  $(".fullscreen-button").css("transform", "scale(" + interfaceScale + ")");
   corpHeaderFooter *= interfaceScale;
   runnerHeaderFooter *= interfaceScale;
 
