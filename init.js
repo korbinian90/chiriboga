@@ -1707,38 +1707,14 @@ function UpdateModernHUD() {
     if (el && el.textContent !== String(val)) el.textContent = String(val);
   }
 
-  setText('hud-you-label', youLabel);
-  setText('hud-opp-label', oppLabel);
-
-  // Active-player breathing highlight: pulses the chip on whichever
-  // side currently holds the turn so it's clear at a glance even
-  // after the turn-change banner has faded.
-  var youChip = document.getElementById('hud-chip-you');
-  var oppChip = document.getElementById('hud-chip-opp');
-  if (youChip) youChip.classList.toggle('is-active', activePlayer === you);
-  if (oppChip) oppChip.classList.toggle('is-active', activePlayer === opp);
-
-  // Side stat chips: clicks + credits. Hide click counters when not
-  // that player's action phase (engine sets clickTracker to 0 between
-  // turns) — but we keep the slot visible for layout stability.
-  var youClicks = (typeof you.clickTracker === 'number') ? you.clickTracker : 0;
-  var oppClicks = (typeof opp.clickTracker === 'number') ? opp.clickTracker : 0;
-  // The chip already has icon spans; we want to update only the value
-  // child, not the wrapper (else we'd wipe the icon).
-  function setStat(rootId, value) {
-    var root = document.getElementById(rootId);
-    if (!root) return;
-    var v = root.querySelector('.hud-stat-val');
-    if (v && v.textContent !== String(value)) v.textContent = String(value);
-  }
-  setStat('hud-you-clicks', youClicks);
-  setStat('hud-opp-clicks', oppClicks);
-  setStat('hud-you-credits', (typeof Credits === 'function') ? Credits(you) : (you.creditPool || 0));
-  setStat('hud-opp-credits', (typeof Credits === 'function') ? Credits(opp) : (opp.creditPool || 0));
+  // Side stat chips for clicks/credits/labels were removed — the existing
+  // PIXI floating counters next to each player's score area handle that
+  // info and look nicer (they're integrated with the scene). The HUD
+  // keeps just the score pill, the Continue CTA, and the turn-change
+  // banner — high-leverage chrome that doesn't duplicate anything.
 
   // Score chip top-center: "<your agenda> / <target>". Use Hearthstone
-  // pattern (the player's own progress). Opponent points are visible
-  // via opp chip if we want to add it later.
+  // pattern (the player's own progress).
   var targetPts = (typeof globalProperties !== 'undefined' && globalProperties.agendaPointsToWin) || 7;
   var youPts = (typeof AgendaPoints === 'function') ? AgendaPoints(you) : 0;
   setText('hud-score-you', youPts);

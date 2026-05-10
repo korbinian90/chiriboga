@@ -944,65 +944,10 @@ canvas {
 	z-index: 6;
 	font-family: 'PlayBoldNisei', 'Courier New', monospace;
 }
-.hud-chip {
-	pointer-events: auto;
-	position: fixed;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-height: 40px;
-	padding: 6px 12px;
-	border: 1px solid var(--border-green-dark);
-	border-radius: 8px;
-	background: rgba(12, 24, 12, 0.85);
-	color: var(--crt-green);
-	font-size: 13px;
-	letter-spacing: 1px;
-	box-shadow: 0 0 10px var(--green-shadow-medium-rgba), inset 0 0 12px rgba(0,0,0,0.6);
-	backdrop-filter: blur(2px);
-	-webkit-backdrop-filter: blur(2px);
-}
-.hud-chip-opp {
-	top: calc(80px + env(safe-area-inset-top, 0)); /* below the menubar */
-	left: calc(8px + env(safe-area-inset-left, 0));
-}
-.hud-chip.is-active {
-	border-color: var(--crt-green);
-	box-shadow: 0 0 14px rgba(64,255,128,0.55), inset 0 0 14px rgba(64,255,128,0.18);
-	animation: hudChipBreath 2.4s ease-in-out infinite;
-}
-@keyframes hudChipBreath {
-	0%, 100% { box-shadow: 0 0 14px rgba(64,255,128,0.45), inset 0 0 14px rgba(64,255,128,0.14); }
-	50%      { box-shadow: 0 0 20px rgba(64,255,128,0.7),  inset 0 0 18px rgba(64,255,128,0.28); }
-}
-.hud-chip-you {
-	bottom: calc(72px + env(safe-area-inset-bottom, 0)); /* above the footer */
-	right: calc(8px + env(safe-area-inset-right, 0));
-}
-.hud-side-label {
-	font-size: 10px;
-	font-weight: 700;
-	letter-spacing: 2px;
-	opacity: 0.65;
-	padding-right: 4px;
-	border-right: 1px solid var(--border-green-dark);
-	margin-right: 2px;
-}
-.hud-stat {
-	display: inline-flex;
-	align-items: baseline;
-	gap: 3px;
-	font-weight: 700;
-}
-.hud-stat-icon {
-	font-size: 12px;
-	opacity: 0.7;
-}
-.hud-stat-val {
-	font-variant-numeric: tabular-nums;
-	min-width: 14px;
-	text-align: right;
-}
+/* Side counter chips were removed in favour of the existing PIXI floating
+   counters (clicks / credits / deck-size). They were aesthetically
+   integrated into the scene and the user preferred them; the HUD chips
+   sat directly on top of them and showed redundant information. */
 
 /* Score chip top-center: glowing & prominent. */
 .hud-score {
@@ -1070,10 +1015,8 @@ canvas {
 	50%      { box-shadow: 0 0 28px rgba(64,255,128,0.6),       inset 0 0 24px rgba(64,255,128,0.32); }
 }
 
-/* Tighter chips on small phones so they don't crowd corners. */
+/* Tighter HUD on small phones. */
 @media (max-width: 480px) {
-	.hud-chip { font-size: 12px; padding: 5px 9px; gap: 6px; }
-	.hud-side-label { display: none; } /* drop the "CORP"/"RUNNER" label to save width */
 	.hud-score { font-size: 16px; padding: 4px 12px; }
 	.hud-continue { min-width: 160px; min-height: 52px; font-size: 15px; letter-spacing: 3px; }
 }
@@ -1127,7 +1070,6 @@ body:has(#loading:not([style*="display: none"])) #modern-hud { display: none; }
    states themselves remain (active chip stays brighter; turn banner
    still appears, just without the scale/letter-spacing sweep). */
 @media (prefers-reduced-motion: reduce) {
-	.hud-chip.is-active        { animation: none; } /* keep the brighter border, drop the breath */
 	.hud-continue.is-pulsing   { animation: none; } /* keep the glow, drop the pulse */
 	.hud-turn-banner.is-showing { animation: turnBannerFade 1.4s linear forwards; } /* simple fade */
 }

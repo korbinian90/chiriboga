@@ -581,24 +581,18 @@
 	<div id="header"></div>
 	<button class="fullscreen-button" onclick="document.getElementById('body').requestFullscreen({ navigationUI: 'hide' });"></button>
 		<div id="fps"></div>
-		<!-- Modern HUD overlay: opponent chip top-left, score chip top-center,
-		     player chip bottom-right, big "Continue" CTA bottom-center.
+		<!-- Modern HUD overlay: agenda score chip top-center, big "Continue"
+		     CTA bottom-center, and a turn-change banner that fades in on
+		     player flip. The existing PIXI floating counters (clicks /
+		     credits / deck-size) handle per-side stats and are left
+		     untouched — they're aesthetically integrated with the scene
+		     and the user prefers them to redundant HTML chips.
 		     Driven by UpdateModernHUD() in init.js, called from Render(). -->
 		<div id="modern-hud">
-			<div class="hud-chip hud-chip-opp" id="hud-chip-opp">
-				<span class="hud-side-label" id="hud-opp-label">CORP</span>
-				<span class="hud-stat" id="hud-opp-clicks" title="Clicks"><span class="hud-stat-icon" aria-hidden="true">●</span><span class="hud-stat-val">·</span></span>
-				<span class="hud-stat" id="hud-opp-credits" title="Credits"><span class="hud-stat-icon" aria-hidden="true">¢</span><span class="hud-stat-val">·</span></span>
-			</div>
-			<div class="hud-score" id="hud-score" title="Agenda points (you · opponent)">
+			<div class="hud-score" id="hud-score" title="Agenda points (you / target)">
 				<span class="hud-score-you" id="hud-score-you">0</span>
 				<span class="hud-score-sep">/</span>
 				<span class="hud-score-target" id="hud-score-target">7</span>
-			</div>
-			<div class="hud-chip hud-chip-you" id="hud-chip-you">
-				<span class="hud-side-label" id="hud-you-label">RUNNER</span>
-				<span class="hud-stat" id="hud-you-clicks" title="Clicks"><span class="hud-stat-icon" aria-hidden="true">●</span><span class="hud-stat-val">·</span></span>
-				<span class="hud-stat" id="hud-you-credits" title="Credits"><span class="hud-stat-icon" aria-hidden="true">¢</span><span class="hud-stat-val">·</span></span>
 			</div>
 			<button type="button" id="hud-continue" class="hud-continue" aria-label="Continue">CONTINUE</button>
 			<!-- Turn-change banner — fades in for ~1.4s when activePlayer flips. -->
