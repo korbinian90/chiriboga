@@ -1682,6 +1682,22 @@ var CardRenderer = {
         );
 	  }
 
+      //safety timeout: if the loading modal is still visible after 8s, force
+      //hide it and start the game anyway. Belt-and-suspenders for cases where
+      //the texture-splice loop below is prevented from finishing (e.g. an
+      //exception thrown by a later ticker listener stops the ticker mid-frame).
+      setTimeout(function () {
+        if ($("#loading").is(":visible")) {
+          console.warn(
+            "Loading modal dismissed by safety timeout after 8s; " +
+              this.loadingTextures.length +
+              " textures still pending."
+          );
+          $("#loading").hide();
+          StartGame();
+        }
+      }.bind(this), 8000);
+
       //add a global ticker
       this.app.ticker.add(function (delta) {
         //make sure all textures are loaded
